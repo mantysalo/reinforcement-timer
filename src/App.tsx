@@ -73,13 +73,15 @@ const App = () => {
                 setTimeLeft(time => time - 1);
             }
             if (timeLeft === 0) {
+              setStart(false);
+              setTimeout(() => {
                 setTimeIndex(timeIndex => {
-                    if (timeIndex < intervals[level].length - 1) {
-                        return timeIndex + 1;
-                    }
-                    return 0;
-                });
-                setStart(false);
+                  if (timeIndex < intervals[level].length - 1) {
+                      return timeIndex + 1;
+                  }
+                  return 0;
+              });
+              }, 0)
             }
         },
         start ? 1000 : null
