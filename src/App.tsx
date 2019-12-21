@@ -119,6 +119,7 @@ const App = () => {
                                 setTimeIndex(index);
                             }}
                             aria-label={`Select time period of ${time} seconds`}
+                            key={`${time}${index}`}
                             selected={index === timeIndex}
                         >
                             {time}
