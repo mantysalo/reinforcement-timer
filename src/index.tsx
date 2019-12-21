@@ -9,13 +9,16 @@ import { createGlobalStyle } from 'styled-components';
 const GlobalStyles = createGlobalStyle`
 ${normalize}
 body {
-font-family: Helvetica, Sans-Serif;
+  font-family: Helvetica, Sans-Serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
-`
+`;
 
 ReactDOM.render(
     <StylesProvider injectFirst>
-      <GlobalStyles/>
+        <GlobalStyles />
         <App />
     </StylesProvider>,
     document.getElementById('root')
