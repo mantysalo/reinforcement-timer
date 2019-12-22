@@ -40,14 +40,14 @@ const Progress = styled.p`
 `;
 
 const StepperContainer = styled.nav`
-display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: center;
-  flex-grow: 1;
-  @media only screen and (max-width : 480px) {
-    width: 100%;
-  }
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    flex-grow: 1;
+    @media only screen and (max-width: 480px) {
+        width: 100%;
+    }
 `;
 
 const initialState: AppState = {
@@ -68,49 +68,71 @@ const renderIcon = (start: boolean, level: number, intervalIndex: number, timeLe
 const App = () => {
     const [state, dispatch] = useReducer(appReducer, initialState);
     const [timeLeft, setTimeLeft] = useState(intervals[state.level][0]);
+    const [shouldAnnounce, setShouldAnnounce] = useState(true);
 
     useEffect(() => setTimeLeft(intervals[state.level][state.intervalIndex]), [state.level, state.intervalIndex]);
 
-    const keyboardShortCutHandler = useCallback(e => {
-        if (e.code === 'Space') dispatch({ type: 'TIMER_BUTTON_CLICKED', payload: {timeLeft} });
-        else if (e.code === 'ArrowDown') dispatch({ type: 'LEVEL_CHANGED', payload: 'decrement' });
-        else if (e.code === 'ArrowUp') dispatch({ type: 'LEVEL_CHANGED', payload: 'increment' });
-        else if (e.code === 'ArrowRight') dispatch({ type: 'INTERVAL_CHANGED', payload: 'increment' });
-        else if (e.code === 'ArrowLeft') dispatch({ type: 'INTERVAL_CHANGED', payload: 'decrement' });
-    }, [timeLeft]);
+    const keyboardShortCutHandler = useCallback(
+        e => {
+            if (e.code === 'Space') dispatch({ type: 'TIMER_BUTTON_CLICKED', payload: { timeLeft } });
+            else if (e.code === 'ArrowDown') dispatch({ type: 'LEVEL_CHANGED', payload: 'decrement' });
+            else if (e.code === 'ArrowUp') dispatch({ type: 'LEVEL_CHANGED', payload: 'increment' });
+            else if (e.code === 'ArrowRight') dispatch({ type: 'INTERVAL_CHANGED', payload: 'increment' });
+            else if (e.code === 'ArrowLeft') dispatch({ type: 'INTERVAL_CHANGED', payload: 'decrement' });
+        },
+        [timeLeft]
+    );
 
     useEffect(() => {
         document.addEventListener('keydown', keyboardShortCutHandler);
         return () => document.removeEventListener('keydown', keyboardShortCutHandler);
     });
 
-    useInterval(() => {
-      if (timeLeft > 0) {
-          setTimeLeft(time => time - 1);
-      }
-      if (timeLeft === 0) {
-        dispatch({type: 'INTERVAL_CHANGED', payload: 'increment'})
-      }
-  }, state.isTimerTicking ? 1000 : null);
+    useEffect(() => {
+        if (timeLeft === 0) {
+            setShouldAnnounce(false);
+        } else if (state.isTimerTicking) {
+            setShouldAnnounce(true);
+        }
+    }, [timeLeft, state.isTimerTicking]);
+
+    useInterval(
+        () => {
+            if (timeLeft > 0) {
+                setTimeLeft(time => time - 1);
+            }
+            if (timeLeft === 0) {
+                dispatch({ type: 'INTERVAL_CHANGED', payload: 'increment' });
+            }
+        },
+        state.isTimerTicking ? 1000 : null
+    );
+
     return (
         <FlexCenter>
             <AppHeader>
-              <IconButton disabled={state.intervalIndex === 0} onClick={() => dispatch({type: 'INTERVAL_CHANGED', payload: 'decrement'})}>
-                <KeyboardArrowLeft/>
-              </IconButton>
-              <div style={{flex: 1}}>
-                <Counter aria-live={state.isTimerTicking ? 'polite' : 'off'}>{timeLeft}</Counter>
-                <Progress>
-                    {state.intervalIndex + 1} / {intervals[state.level].length}
-                </Progress>
+                <IconButton
+                    disabled={state.intervalIndex === 0}
+                    onClick={() => dispatch({ type: 'INTERVAL_CHANGED', payload: 'decrement' })}
+                >
+                    <KeyboardArrowLeft />
+                </IconButton>
+                <div style={{ flex: 1 }}>
+                    <Counter aria-live={shouldAnnounce ? 'polite' : 'off'}>{timeLeft}</Counter>
+                    <Progress>
+                        {state.intervalIndex + 1} / {intervals[state.level].length}
+                    </Progress>
                 </div>
-                <IconButton disabled={state.intervalIndex === intervals[state.level].length - 1} onClick={() => dispatch({type: 'INTERVAL_CHANGED', payload: 'increment'})}>
-                <KeyboardArrowRight/>
-              </IconButton>
+                <IconButton
+                    disabled={state.intervalIndex === intervals[state.level].length - 1}
+                    onClick={() => dispatch({ type: 'INTERVAL_CHANGED', payload: 'increment' })}
+                >
+                    <KeyboardArrowRight />
+                </IconButton>
             </AppHeader>
             <StepperContainer>
                 <Fab
-                    onClick={() => dispatch({ type: 'TIMER_BUTTON_CLICKED', payload: {timeLeft} })}
+                    onClick={() => dispatch({ type: 'TIMER_BUTTON_CLICKED', payload: { timeLeft } })}
                     color='primary'
                     aria-label={state.isTimerTicking ? 'stop timer' : 'start timer'}
                     aria-pressed={state.isTimerTicking}
@@ -119,7 +141,11 @@ const App = () => {
                     {renderIcon(state.isTimerTicking, state.level, state.intervalIndex, timeLeft)}
                 </Fab>
                 <LevelIndicator aria-live='polite'>Level {state.level}</LevelIndicator>
-                <DotsStepper activeStep={state.level - 1} dispatch={dispatch} stepCount={Object.keys(intervals).length} />
+                <DotsStepper
+                    activeStep={state.level - 1}
+                    dispatch={dispatch}
+                    stepCount={Object.keys(intervals).length}
+                />
             </StepperContainer>
         </FlexCenter>
     );
