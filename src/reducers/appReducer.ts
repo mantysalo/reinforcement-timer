@@ -29,7 +29,7 @@ export interface AppState {
     isTimerTicking: boolean;
 }
 
-export const appReducer = (state: AppState, action: ActionType) => {
+export const appReducer = (state: AppState, action: ActionType): AppState => {
     switch (action.type) {
         case LEVEL_CHANGED:
             if (action.payload === 'increment' && state.level < Object.keys(intervals).length) {
@@ -37,14 +37,12 @@ export const appReducer = (state: AppState, action: ActionType) => {
                     intervalIndex: 0,
                     level: state.level + 1,
                     isTimerTicking: false,
-                    timeLeft: intervals[state.level + 1][state.intervalIndex],
                 };
             } else if (action.payload === 'decrement' && state.level > 1) {
                 return {
                     intervalIndex: 0,
                     level: state.level - 1,
-                    isTimerTicking: false,
-                    timeLeft: intervals[state.level - 1][state.intervalIndex],
+                    isTimerTicking: false
                 };
             }
             return { ...state };
@@ -53,15 +51,13 @@ export const appReducer = (state: AppState, action: ActionType) => {
                 return {
                     ...state,
                     intervalIndex: state.intervalIndex + 1,
-                    isTimerTicking: false,
-                    timeLeft: intervals[state.level][state.intervalIndex + 1],
+                    isTimerTicking: false
                 };
             } else if (action.payload === 'decrement' && state.intervalIndex > 0) {
                 return {
                     ...state,
                     intervalIndex: state.intervalIndex - 1,
-                    isTimerTicking: false,
-                    timeLeft: intervals[state.level][state.intervalIndex - 1],
+                    isTimerTicking: false
                 };
             }
             return { ...state };
