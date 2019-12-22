@@ -8,11 +8,17 @@ import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyles = createGlobalStyle`
 ${normalize}
+html, body {
+  height: 100%;
+}
 body {
   font-family: Helvetica, Sans-Serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+}
+#root {
+  height: 100%;
 }
 `;
 
